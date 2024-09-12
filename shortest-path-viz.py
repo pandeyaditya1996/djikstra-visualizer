@@ -1,5 +1,6 @@
 import heapq
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 
 def read_input_files():
     with open('input.txt', 'r') as f:
@@ -56,9 +57,24 @@ def dijkstra(n, start, goal, edges):
     return path, distances[goal]
 
 def plot_path(coords, path):
-    x, y = zip(*[coords[i-1] for i in path])
-    plt.plot(x, y, 'ro-')
-    plt.title("Shortest Path")
+    fig, ax = plt.subplots()
+    x, y = zip(*coords)
+    ax.plot(x, y, 'bo')  # Plot all points
+    line, = ax.plot([], [], 'ro-')  # Line for the path
+
+    def init():
+        line.set_data([], [])
+        return line,
+
+    def update(frame):
+        path_x, path_y = zip(*[coords[i-1] for i in path[:frame+1]])
+        line.set_data(path_x, path_y)
+        return line,
+
+    ani = FuncAnimation(fig, update, frames=len(path), init_func=init, blit=True, repeat=False)
+    ani.save('17461873.mp4', writer='ffmpeg')
+
+    plt.title("Shortest Path Animation")
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.grid(True)
